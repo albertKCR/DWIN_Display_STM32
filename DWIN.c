@@ -71,7 +71,7 @@ void readDisplayFloat(float *myFloat)
     }
 }
 
-char* getVP()
+char *getVP()
 {
     uint8_t buffer1[10];
 
@@ -83,4 +83,35 @@ char* getVP()
 
         return buffer1;
     }
+}
+
+void dwinSendDouble(uint16_t vp, double doubleNumber)
+{
+    uint8_t hex[8] = {0};
+
+    doubleToHex(doubleNumber, hex);
+
+    uint8_t cmd[] = {
+        0x5A,
+        0xA5,
+        0x0B,
+        0x82,
+        (vp >> 8) & 0xFF,
+        vp & 0xFF,
+		hex[7],
+		hex[6],
+		hex[5],
+		hex[4],
+		hex[3],
+        hex[2],
+		hex[1],
+		hex[0]
+    };
+
+    HAL_UART_Transmit(&huart1, cmd, sizeof(cmd), HAL_MAX_DELAY);
+}
+
+void doubleToHex(double d, uint8_t *hex)
+{
+	memcpy(hex, &d, sizeof(double));
 }
